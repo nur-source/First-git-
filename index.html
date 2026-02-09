@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Personnel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .dashboard {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .stat-card .label {
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-secondary.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .leads-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            padding: 30px;
+        }
+
+        thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.95em;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .badge-nouveau {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-contacté {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .badge-rdv {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-converti {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .score-chaud {
+            color: #d32f2f;
+        }
+
+        .score-tiede {
+            color: #f57c00;
+        }
+
+        .score-froid {
+            color: #1976d2;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 8px 12px;
+            font-size: 0.9em;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-call {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-sms {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-action:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .form-buttons button {
+            flex: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #999;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 CRM Personnel</h1>
+            <p>Gérez vos leads avec WhatsApp, SMS et bien plus</p>
+        </header>
+
+        <!-- Dashboard Stats -->
+        <div class="dashboard" id="dashboard">
+            <div class="stat-card">
+                <div class="label">Leads Total</div>
+                <div class="number" id="total-leads">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">🔥 Chaud</div>
+                <div class="number" id="leads-chaud" style="color: #d32f2f;">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">🌤️ Tiède</div>
+                <div class="number" id="leads-tiede" style="color: #f57c00;">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">❄️ Froid</div>
+                <div class="number" id="leads-froid" style="color: #1976d2;">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">✅ Converti</div>
+                <div class="number" id="leads-converti" style="color: #388e3c;">0</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn-primary" onclick="openAddLeadModal()">+ Nouveau Lead</button>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Rechercher par nom, téléphone ou email..."
+                    onkeyup="filterLeads()">
+            </div>
+
+            <div>
+                <button class="btn-secondary active" onclick="filterByStatus('Tous')">Tous</button>
+                <button class="btn-secondary" onclick="filterByStatus('Nouveau')">Nouveaux</button>
+                <button class="btn-secondary" onclick="filterByStatus('Contacté')">Contactés</button>
+                <button class="btn-secondary" onclick="filterByStatus('RDV Pris')">RDV Pris</button>
+                <button class="btn-secondary" onclick="filterByStatus('Converti')">Convertis</button>
+            </div>
+        </div>
+
+        <!-- Leads Table -->
+        <div class="leads-container">
+            <table id="leadsTable">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Téléphone</th>
+                        <th>Email</th>
+                        <th>Statut</th>
+                        <th>Score</th>
+                        <th>Source</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="leadsBody">
+                </tbody>
+            </table>
+            <div id="emptyState" class="empty-state" style="display:none;">
+                <h3>Aucun lead trouvé</h3>
+                <p>Cliquez sur "+ Nouveau Lead" pour en ajouter un</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter/Modifier Lead -->
+    <div id="leadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLeadModal()">&times;</span>
+            <div class="modal-header" id="modalTitle">Nouveau Lead</div>
+
+            <form onsubmit="saveLead(event)">
+                <div class="form-group">
+                    <label>Nom *</label>
+                    <input type="text" id="leadName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Téléphone *</label>
+                    <input type="tel" id="leadPhone" placeholder="+33..." required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="leadEmail">
+                </div>
+
+                <div class="form-group">
+                    <label>Statut</label>
+                    <select id="leadStatut">
+                        <option>Nouveau</option>
+                        <option>Contacté</option>
+                        <option>RDV Pris</option>
+                        <option>Converti</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Score</label>
+                    <select id="leadScore">
+                        <option>Chaud 🔥</option>
+                        <option>Tiède 🌤️</option>
+                        <option>Froid ❄️</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Source</label>
+                    <select id="leadSource">
+                        <option>WhatsApp</option>
+                        <option>SMS</option>
+                        <option>Google</option>
+                        <option>Walk-in</option>
+                        <option>Autre</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="leadNotes" placeholder="Ajouter des notes..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Date de relance</label>
+                    <input type="date" id="leadRelanceDate">
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn-primary">Enregistrer</button>
+                    <button type="button" class="btn-secondary" onclick="closeLeadModal()">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentLeadId = null;
+        let currentFilter = 'Tous';
+        let allLeads = [];
+
+        // Charger les leads au démarrage
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLeads();
+            loadStats();
+            setInterval(loadStats, 5000); // Rafraîchir stats tous les 5s
+        });
+
+        // Charger tous les leads
+        async function loadLeads() {
+            try {
+                const response = await fetch('/api/leads');
+                allLeads = await response.json();
+                displayLeads(allLeads);
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du chargement des leads');
+            }
+        }
+
+        // Charger les statistiques
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+
+                document.getElementById('total-leads').textContent = stats.total;
+                document.getElementById('leads-chaud').textContent = stats.parScore['Chaud'];
+                document.getElementById('leads-tiede').textContent = stats.parScore['Tiède'];
+                document.getElementById('leads-froid').textContent = stats.parScore['Froid'];
+                document.getElementById('leads-converti').textContent = stats.parStatut['Converti'];
+            } catch (error) {
+                console.error('Erreur stats:', error);
+            }
+        }
+
+        // Afficher les leads
+        function displayLeads(leads) {
+            const tbody = document.getElementById('leadsBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (leads.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            tbody.innerHTML = leads.map(lead => `
+        <tr onclick="editLead(${lead.id})">
+          <td><strong>${lead.nom}</strong></td>
+          <td>${lead.phone}</td>
+          <td>${lead.email || '-'}</td>
+          <td><span class="badge badge-${lead.statut.toLowerCase().replace(' ', '')}">${lead.statut}</span></td>
+          <td><span class="score-${lead.score.split(' ')[0].toLowerCase()}">${lead.score}</span></td>
+          <td>${lead.source}</td>
+          <td>${lead.notes ? lead.notes.substring(0, 30) + '...' : '-'}</td>
+          <td class="actions" onclick="event.stopPropagation()">
+            <button class="btn-action btn-call" onclick="callLead('${lead.phone}')">📞</button>
+            <button class="btn-action btn-sms" onclick="sendSMS('${lead.phone}')">💬</button>
+            <button class="btn-action btn-whatsapp" onclick="sendWhatsApp('${lead.phone}')">📱</button>
+            <button class="btn-action btn-delete" onclick="deleteLead(${lead.id})">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+        }
+
+        // Filtrer par statut
+        function filterByStatus(status) {
+            currentFilter = status;
+            const filtered = status === 'Tous' ? allLeads : allLeads.filter(l => l.statut === status);
+            displayLeads(filtered);
+
+            // Mettre à jour boutons
+            document.querySelectorAll('.controls .btn-secondary').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(status) || (status === 'Tous' && btn.textContent === 'Tous')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Rechercher
+        function filterLeads() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allLeads.filter(l =>
+                l.nom.toLowerCase().includes(search) ||
+                l.phone.toLowerCase().includes(search) ||
+                (l.email && l.email.toLowerCase().includes(search))
+            );
+            displayLeads(filtered);
+        }
+
+        // Ouvrir modal
+        function openAddLeadModal() {
+            currentLeadId = null;
+            document.getElementById('modalTitle').textContent = 'Nouveau Lead';
+            document.getElementById('leadName').value = '';
+            document.getElementById('leadPhone').value = '';
+            document.getElementById('leadEmail').value = '';
+            document.getElementById('leadStatut').value = 'Nouveau';
+            document.getElementById('leadScore').value = 'Chaud 🔥';
+            document.getElementById('leadSource').value = 'WhatsApp';
+            document.getElementById('leadNotes').value = '';
+            document.getElementById('leadRelanceDate').value = '';
+            document.getElementById('leadModal').classList.add('show');
+        }
+
+        // Éditer lead
+        async function editLead(id) {
+            const lead = allLeads.find(l => l.id === id);
+            if (!lead) return;
+
+            currentLeadId = id;
+            document.getElementById('modalTitle').textContent = 'Modifier Lead';
+            document.getElementById('leadName').value = lead.nom;
+            document.getElementById('leadPhone').value = lead.phone;
+            document.getElementById('leadEmail').value = lead.email || '';
+            document.getElementById('leadStatut').value = lead.statut;
+            document.getElementById('leadScore').value = lead.score;
+            document.getElementById('leadSource').value = lead.source;
+            document.getElementById('leadNotes').value = lead.notes || '';
+            document.getElementById('leadRelanceDate').value = lead.dateRelance ? lead.dateRelance.split('T')[0] : '';
+            document.getElementById('leadModal').classList.add('show');
+        }
+
+        // Fermer modal
+        function closeLeadModal() {
+            document.getElementById('leadModal').classList.remove('show');
+        }
+
+        // Sauvegarder lead
+        async function saveLead(event) {
+            event.preventDefault();
+
+            const leadData = {
+                nom: document.getElementById('leadName').value,
+                phone: document.getElementById('leadPhone').value,
+                email: document.getElementById('leadEmail').value,
+                statut: document.getElementById('leadStatut').value,
+                score: document.getElementById('leadScore').value,
+                source: document.getElementById('leadSource').value,
+                notes: document.getElementById('leadNotes').value,
+                dateRelance: document.getElementById('leadRelanceDate').value
+            };
+
+            try {
+                if (currentLeadId) {
+                    // Modifier
+                    await fetch(`/api/leads/${currentLeadId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(leadData)
+                    });
+                    alert('Lead modifié avec succès!');
+                } else {
+                    // Ajouter
+                    await fetch('/api/leads', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(leadData)
+                    });
+                    alert('Lead ajouté avec succès!');
+                }
+                closeLeadModal();
+                loadLeads();
+                loadStats();
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'enregistrement');
+            }
+        }
+
+        // Supprimer lead
+        async function deleteLead(id) {
+            if (!confirm('Êtes-vous sûr?')) return;
+
+            try {
+                await fetch(`/api/leads/${id}`, { method: 'DELETE' });
+                loadLeads();
+                loadStats();
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Actions rapides
+        function callLead(phone) {
+            window.location.href = `tel:${phone}`;
+        }
+
+        async function sendSMS(phone) {
+            const message = prompt('Message SMS:', '');
+            if (!message) return;
+
+            try {
+                const response = await fetch('/api/send-sms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, message })
+                });
+                const data = await response.json();
+                alert(data.message);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        async function sendWhatsApp(phone) {
+            const message = prompt('Message WhatsApp:', '');
+            if (!message) return;
+
+            try {
+                const response = await fetch('/api/send-whatsapp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, message })
+                });
+                const data = await response.json();
+                alert(data.message);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Fermer modal en cliquant dehors
+        window.onclick = function (event) {
+            const modal = document.getElementById('leadModal');
+            if (event.target === modal) {
+                closeLeadModal();
+            }
+        };
+    </script>
+</body>
+
+</html>
